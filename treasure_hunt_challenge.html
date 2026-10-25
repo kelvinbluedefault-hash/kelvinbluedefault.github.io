@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Treasure Hunt - Level 2</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0b0c10;
+      color: #c5c6c7;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      background: #1f2833;
+      border: 2px solid #66fcf1;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 0 20px rgba(102, 252, 241, 0.2);
+      text-align: center;
+    }
+
+    h1 {
+      color: #66fcf1;
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #8892b0;
+      margin-bottom: 24px;
+    }
+
+    .question-box {
+      background: #0b0c10;
+      padding: 16px;
+      border-radius: 8px;
+      border-left: 4px solid #66fcf1;
+      text-align: left;
+      margin-bottom: 20px;
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 16px;
+      background: #0b0c10;
+      border: 1px solid #45a29e;
+      border-radius: 6px;
+      color: #ffffff;
+      font-size: 1rem;
+      margin-bottom: 16px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    input[type="text"]:focus {
+      border-color: #66fcf1;
+      box-shadow: 0 0 8px rgba(102, 252, 241, 0.3);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #66fcf1;
+      color: #0b0c10;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    button:hover {
+      background: #45a29e;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    /* Modal for wrong answer feedback */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      z-index: 100;
+    }
+
+    .modal-content {
+      background: #1f2833;
+      border: 2px solid #ff4d4d;
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(255, 77, 77, 0.3);
+      animation: popIn 0.25s ease-out;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .emoji {
+      font-size: 4rem;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      color: #ff4d4d;
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .modal-desc {
+      color: #c5c6c7;
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+    }
+
+    .retry-btn {
+      background: #ff4d4d;
+      color: #ffffff;
+    }
+
+    .retry-btn:hover {
+      background: #cc0000;
+    }
+
+    /* Success Screen */
+    .success-box {
+      display: none;
+    }
+
+    .success-icon {
+      font-size: 3.5rem;
+      margin-bottom: 12px;
+    }
+
+    .pass-container {
+      background: #0b0c10;
+      border: 2px dashed #66fcf1;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+
+    .pass-label {
+      font-size: 0.8rem;
+      color: #8892b0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .pass-key {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #66fcf1;
+      letter-spacing: 2px;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" id="quizCard">
+    <h1>STAGE 2 HURDLE</h1>
+    <p class="subtitle">Answer correctly to obtain the Discord key</p>
+
+    <div class="question-box">
+      <strong>Question:</strong><br />
+      What is the secret answer required to clear this stage?
+    </div>
+
+    <form id="quizForm" onsubmit="checkAnswer(event)">
+      <input type="text" id="answerInput" placeholder="Type your answer here..." autocomplete="off" required />
+      <button type="submit">SUBMIT ANSWER</button>
+    </form>
+  </div>
+
+  <!-- Success Display -->
+  <div class="container success-box" id="successCard">
+    <div class="success-icon">🎉</div>
+    <h1>ACCESS GRANTED!</h1>
+    <p class="subtitle">You have solved the hurdle.</p>
+
+    <div class="pass-container">
+      <div class="pass-label">Next Stage Password</div>
+      <div class="pass-key">WEWILLFOREVER!</div>
+    </div>
+
+    <p style="font-size: 0.85rem; color: #8892b0;">
+      Copy this password and return to Discord to proceed to the next stage.
+    </p>
+  </div>
+
+  <!-- Incorrect Answer Modal Overlay -->
+  <div class="modal-overlay" id="errorModal">
+    <div class="modal-content">
+      <div class="emoji" id="modalEmoji">😡</div>
+      <div class="modal-title">WRONG ANSWER!</div>
+      <div class="modal-desc">You got the answer wrong. Try again!</div>
+      <button class="retry-btn" onclick="closeModal()">TRY AGAIN</button>
+    </div>
+  </div>
+
+  <script>
+    const CORRECT_ANSWER = "ILYHEH";
+    const emojis = ["😡", "😭", "🤬", "🥺"];
+
+    function checkAnswer(event) {
+      event.preventDefault();
+      const userVal = document.getElementById("answerInput").value.trim().toUpperCase();
+
+      if (userVal === CORRECT_ANSWER) {
+        document.getElementById("quizCard").style.display = "none";
+        document.getElementById("successCard").style.display = "block";
+      } else {
+        // Randomly show an angry or weeping emoji
+        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+        document.getElementById("modalEmoji").textContent = randomEmoji;
+        document.getElementById("errorModal").style.display = "flex";
+      }
+    }
+
+    function closeModal() {
+      document.getElementById("errorModal").style.display = "none";
+      const input = document.getElementById("answerInput");
+      input.value = "";
+      input.focus();
+    }
+  </script>
+</body>
+</html>
