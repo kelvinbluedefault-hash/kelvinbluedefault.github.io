@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>The Voyage // To the Brightest Star</title>
+
+  <!-- Google Fonts: Editorial Serif + Space Mono + Script Accent -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400;1,600&family=Playfair+Display:ital,wght@0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       THEME & COLOR PALETTE (#001154 Baseline)
+       ========================================================================== */
+    :root {
+      --space-black: #000414;
+      --space-navy: #001154;      /* Deep midnight imperial navy */
+      --space-slate: #051d7a;
+      --gold-primary: #ffd700;    /* Burnished Voyager Gold */
+      --gold-dim: #c5a03e;
+      --starlight: #f0f4ff;
+      --text-muted: #8fa2db;
+      --card-bg: rgba(0, 17, 84, 0.4);
+      --font-mono: 'Space Mono', monospace;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-display: 'Playfair Display', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 10%, #061a7a 0%, var(--space-navy) 35%, var(--space-black) 90%);
+      color: var(--starlight);
+      font-family: var(--font-serif);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient drifting canvas */
+    #space-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Audio Toggle in bottom left */
+    .audio-toggle-btn {
+      position: fixed;
+      bottom: 24px;
+      left: 20px;
+      z-index: 100;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(0, 17, 84, 0.7);
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      backdrop-filter: blur(8px);
+      color: var(--gold-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+
+    /* Sneaky Easter Egg to Page 3 in bottom right */
+    .sneaky-portal {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      z-index: 99;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.18); /* Barely visible */
+      text-decoration: none;
+      letter-spacing: 1px;
+      padding: 8px;
+      transition: color 0.4s ease;
+    }
+    .sneaky-portal:hover {
+      color: var(--gold-primary);
+    }
+
+    /* Main Container */
+    .voyage-container {
+      position: relative;
+      z-index: 2;
+      width: 92%;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 60px 0 100px;
+    }
+
+    /* Hero Section */
+    .hero-section {
+      text-align: center;
+      margin-bottom: 70px;
+      padding-top: 20px;
+    }
+
+    .mission-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--gold-primary);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      opacity: 0.85;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: 34px;
+      line-height: 1.25;
+      color: #ffffff;
+      margin-bottom: 16px;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold-primary);
+    }
+
+    .hero-intro {
+      font-size: 17px;
+      line-height: 1.6;
+      color: var(--text-muted);
+      max-width: 480px;
+      margin: 0 auto 30px;
+    }
+
+    /* Vertical Timeline Section */
+    .timeline-wrapper {
+      position: relative;
+      padding-left: 28px;
+      margin-bottom: 80px;
+    }
+
+    /* Vertical Trajectory Line */
+    .timeline-wrapper::before {
+      content: "";
+      position: absolute;
+      top: 10px;
+      bottom: 20px;
+      left: 7px;
+      width: 2px;
+      background: linear-gradient(180deg, var(--gold-primary) 0%, rgba(255,215,0,0.2) 75%, transparent 100%);
+    }
+
+    .timeline-node {
+      position: relative;
+      margin-bottom: 50px;
+    }
+
+    /* Node Star Dot */
+    .timeline-node::before {
+      content: "";
+      position: absolute;
+      left: -28px;
+      top: 5px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--space-navy);
+      border: 2px solid var(--gold-primary);
+      box-shadow: 0 0 10px var(--gold-primary);
+    }
+
+    .stage-metric {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      color: var(--gold-primary);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .story-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 215, 0, 0.15);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    }
+
+    .chapter-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .chapter-title {
+      font-family: var(--font-display);
+      font-size: 24px;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .chapter-text {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #d1d9f5;
+    }
+
+    /* Infinite stage ending with dots */
+    .infinite-node::before {
+      border-style: dashed;
+      animation: pulseStar 2s infinite alternate;
+    }
+    @keyframes pulseStar {
+      from { transform: scale(1); box-shadow: 0 0 4px var(--gold-primary); }
+      to { transform: scale(1.3); box-shadow: 0 0 16px var(--gold-primary); }
+    }
+
+    /* ==========================================================================
+       THE GOLDEN RECORD & LETTER SECTION
+       ========================================================================== */
+    .record-section {
+      text-align: center;
+      margin: 80px 0;
+    }
+
+    .record-wrapper {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      margin: 0 auto 24px;
+      cursor: pointer;
+    }
+
+    /* Realistic Rotating Golden Record */
+    .golden-record {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle, #e6b800 0%, #a67c00 20%, #473600 22%, #ffd700 24%, #8c6b00 45%, #ffd700 65%, #3d2e00 80%, #ffd700 100%);
+      box-shadow: 0 0 35px rgba(255, 215, 0, 0.45), inset 0 0 15px rgba(0, 0, 0, 0.6);
+      position: relative;
+      transition: transform 0.8s ease;
+      animation: floatRecord 6s ease-in-out infinite;
+    }
+
+    .golden-record.spinning {
+      animation: spinRecord 4s linear infinite;
+    }
+
+    .record-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #111;
+      border: 3px solid var(--gold-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold-primary);
+      font-size: 16px;
+    }
+
+    @keyframes floatRecord {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes spinRecord {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .record-prompt {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--gold-primary);
+      text-transform: uppercase;
+      margin-top: 10px;
+    }
+
+    /* Letter Glass Container */
+    #letter-container {
+      display: none;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s ease;
+      background: rgba(0, 17, 84, 0.6);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--gold-primary);
+      border-radius: 20px;
+      padding: 34px 26px;
+      margin-top: 30px;
+      text-align: left;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    }
+
+    .letter-greeting {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 26px;
+      color: var(--gold-primary);
+      margin-bottom: 18px;
+    }
+
+    .letter-body {
+      font-size: 17px;
+      line-height: 1.8;
+      color: #e3ebff;
+      margin-bottom: 24px;
+    }
+
+    .letter-signoff {
+      font-family: var(--font-display);
+      font-style: italic;
+      text-align: right;
+      color: var(--gold-primary);
+      font-size: 18px;
+    }
+
+    /* ==========================================================================
+       PHOTO GALLERY (Vertical Mobile-First Stack)
+       ========================================================================== */
+    .gallery-section {
+      margin: 80px 0;
+    }
+
+    .section-headline {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .photo-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 215, 0, 0.15);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .photo-img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      display: block;
+      cursor: pointer;
+    }
+
+    .photo-meta {
+      padding: 18px 20px;
+    }
+
+    .photo-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .photo-caption {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ==========================================================================
+       STARLIGHT BEACONS (Interactive Wish Sender)
+       ========================================================================== */
+    .wish-box {
+      background: var(--card-bg);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 215, 0, 0.25);
+      border-radius: 20px;
+      padding: 30px 24px;
+      text-align: center;
+      margin: 60px 0;
+    }
+
+    .wish-input {
+      width: 100%;
+      height: 90px;
+      background: rgba(0, 8, 36, 0.6);
+      border: 1px solid rgba(255, 215, 0, 0.2);
+      border-radius: 12px;
+      color: #fff;
+      font-family: var(--font-serif);
+      font-size: 16px;
+      padding: 14px;
+      margin: 18px 0;
+      resize: none;
+      outline: none;
+    }
+
+    .wish-input:focus {
+      border-color: var(--gold-primary);
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #ffd700 0%, #d4af37 100%);
+      color: #000c3b;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(255, 215, 0, 0.3);
+    }
+
+    .wish-status {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold-primary);
+      margin-top: 12px;
+      min-height: 16px;
+    }
+
+    /* Return to Orbit */
+    .return-top-btn {
+      display: block;
+      margin: 40px auto 10px;
+      padding: 14px 28px;
+      background: transparent;
+      border: 1px solid var(--gold-primary);
+      color: var(--gold-primary);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 2px;
+      border-radius: 30px;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      width: fit-content;
+    }
+
+    /* Lightbox Modal */
+    #lightbox {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 4, 20, 0.94);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 20px;
+    }
+    #lightbox img {
+      max-width: 95%;
+      max-height: 80vh;
+      border-radius: 12px;
+      border: 1px solid var(--gold-primary);
+    }
+    #lightbox-caption {
+      margin-top: 15px;
+      color: var(--gold-primary);
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Ambience & Drifting Stars -->
+  <canvas id="space-canvas"></canvas>
+  <audio id="ambient-audio" src="assets/audio/ambient-chime.mp3" loop></audio>
+
+  <!-- Sound Toggle Button -->
+  <button class="audio-toggle-btn" onclick="toggleAmbience()" title="Toggle Background Chime">♪</button>
+
+  <!-- Sneaky Gateway to Page 3 (Easter Egg) -->
+  <a href="destination.html" class="sneaky-portal" title="Deep Space Coordinate">✦ [ 42.1° N ]</a>
+
+  <div class="voyage-container">
+
+    <!-- ==========================================
+         HERO SECTION
+         ========================================== -->
+    <header class="hero-section">
+      <div class="mission-badge">// INTERSTELLAR LOG: FLIGHT TO YOU</div>
+      <h1 class="hero-title">To the Brightest Star in <em>My Universe</em></h1>
+      <p class="hero-intro">
+        Every milestone in our journey holds its own gravity. As we drift further into the cosmos, here are a few coordinates worth keeping forever.
+      </p>
+    </header>
+
+    <!-- ==========================================
+         VERTICAL TIMELINE JOURNEY
+         ========================================== -->
+    <div class="timeline-wrapper">
+
+      <!-- Stage 01 -->
+      <div class="timeline-node">
+        <div class="stage-metric">Stage 01: Low Earth Orbit — 0.00005 ly</div>
+        <div class="story-card">
+          <div class="chapter-tag">Chapter One</div>
+          <h2 class="chapter-title">The First Message</h2>
+          <p class="chapter-text">
+            That single notification that sparked everything. Out of all the billions of signals crossing through the noise, yours came through crystal clear.
+          </p>
+        </div>
+      </div>
+
+      <!-- Stage 02 -->
+      <div class="timeline-node">
+        <div class="stage-metric">Stage 02: Lunar Horizon — 0.00280 ly</div>
+        <div class="story-card">
+          <div class="chapter-tag">Chapter Two</div>
+          <h2 class="chapter-title">The First Call</h2>
+          <p class="chapter-text">
+            Hours disappearing in what felt like seconds. Hearing your laugh for the first time made the entire world suddenly feel warm and quiet.
+          </p>
+        </div>
+      </div>
+
+      <!-- Stage 03 -->
+      <div class="timeline-node">
+        <div class="stage-metric">Stage 03: The Nebula Crossing — 0.08450 ly</div>
+        <div class="story-card">
+          <div class="chapter-tag">Chapter Three</div>
+          <h2 class="chapter-title">The Incident</h2>
+          <p class="chapter-text">
+            We’ve navigated our share of turbulent orbits and unexpected solar flares, but somehow, we always steered each other right back home.
+          </p>
+        </div>
+      </div>
+
+      <!-- Stage 04 -->
+      <div class="timeline-node">
+        <div class="stage-metric">Stage 04: Interstellar Void — 0.35000 ly</div>
+        <div class="story-card">
+          <div class="chapter-tag">Chapter Four</div>
+          <h2 class="chapter-title">And Finally, Now</h2>
+          <p class="chapter-text">
+            Standing here today, celebrating the day you came into this world. You remain the constant light in everything I do.
+          </p>
+        </div>
+      </div>
+
+      <!-- Stage 05 (Requested Never-Ending Milestone) -->
+      <div class="timeline-node infinite-node">
+        <div class="stage-metric">Stage 05: The Infinite Reach — ∞ . . . ly</div>
+        <div class="story-card" style="border-style: dashed;">
+          <div class="chapter-tag">Uncharted Cosmos</div>
+          <h2 class="chapter-title">To Everything Ahead . . .</h2>
+          <p class="chapter-text">
+            No mapped coordinates, no boundaries, and no end in sight. Just moving forward together into whatever universe awaits us.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==========================================
+         THE GOLDEN RECORD (INTERACTIVE LETTER)
+         ========================================== -->
+    <section class="record-section">
+      <div class="mission-badge">// INTERSTELLAR ARTIFACT</div>
+      <h2 class="hero-title" style="font-size: 26px;">The Golden Record</h2>
+      <p class="hero-intro" style="margin-bottom: 20px;">Etched with words carried across light-years, meant only for you.</p>
+
+      <div class="record-wrapper" onclick="openGoldenRecord()">
+        <div class="golden-record" id="record-disc">
+          <div class="record-center">✦</div>
+        </div>
+      </div>
+      <p class="record-prompt" id="record-hint">↓ Tap the Record to Play Frequency</p>
+
+      <!-- Glassmorphic Birthday Letter -->
+      <div id="letter-container">
+        <h3 class="letter-greeting">Dear you,</h3>
+        <p class="letter-body">
+          I wanted to send this letter the way the old Voyager probes carried the Golden Record into deep space — etched with memories, set adrift, and trusted to reach the only destination that ever truly mattered: you.<br><br>
+          Thank you for being my anchor when space gets cold, and for bringing pure light into every quiet corner of my life. Happy Birthday, truly.
+        </p>
+        <p class="letter-signoff">— with so much love, always</p>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         PHOTO GALLERY (Mobile-Optimized)
+         ========================================== -->
+    <section class="gallery-section">
+      <div class="section-headline">
+        <div class="mission-badge">// ARCHIVED TRANSMISSIONS</div>
+        <h2 class="hero-title" style="font-size: 26px;">Moments in Orbit</h2>
+        <p class="hero-intro">Tap any photograph to take a closer look.</p>
+      </div>
+
+      <!-- Photo 1 -->
+      <div class="photo-card">
+        <!-- Placeholder: put your image in assets/images/photo-1.jpg -->
+        <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800&auto=format&fit=crop" class="photo-img" onclick="openLightbox(this.src, 'Frame 01: The Smile That Bent Gravity')" alt="Moment 1" />
+        <div class="photo-meta">
+          <h3 class="photo-title">Frame 01: The Smile That Bent Gravity</h3>
+          <p class="photo-caption">My absolute favorite memory that stopped time.</p>
+        </div>
+      </div>
+
+      <!-- Photo 2 -->
+      <div class="photo-card">
+        <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=800&auto=format&fit=crop" class="photo-img" onclick="openLightbox(this.src, 'Frame 02: Stolen Moments in Orbit')" alt="Moment 2" />
+        <div class="photo-meta">
+          <h3 class="photo-title">Frame 02: Stolen Moments in Orbit</h3>
+          <p class="photo-caption">Just us, where nothing else in the world mattered.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         STARLIGHT BEACON: MAKE A BIRTHDAY WISH
+         ========================================== -->
+    <section class="wish-box">
+      <div class="mission-badge">// STELLAR BEACON</div>
+      <h2 class="hero-title" style="font-size: 24px;">Release a Wish into Orbit</h2>
+      <p class="hero-intro" style="font-size: 15px; margin-bottom: 0;">Type a wish for this new year of your life. The stars will keep it safe.</p>
+
+      <textarea id="wish-text" class="wish-input" placeholder="Write your birthday wish here..."></textarea>
+      
+      <button class="action-btn" onclick="sendWishToStars()">Launch Wish into Orbit ✦</button>
+      <div class="wish-status" id="wish-status"></div>
+    </section>
+
+    <!-- Return to top -->
+    <a href="#" class="return-top-btn">Return to Earth Orbit ↑</a>
+
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div id="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="Expanded View" />
+    <div id="lightbox-caption"></div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       GOLDEN RECORD INTERACTION
+       ========================================================================== */
+    let recordPlayed = false;
+    function openGoldenRecord() {
+      const disc = document.getElementById('record-disc');
+      const hint = document.getElementById('record-hint');
+      const letter = document.getElementById('letter-container');
+
+      if (!recordPlayed) {
+        disc.classList.add('spinning');
+        hint.innerText = "✦ Playing Frequency...";
+        
+        setTimeout(() => {
+          letter.style.display = "block";
+          setTimeout(() => {
+            letter.style.opacity = "1";
+            letter.style.transform = "translateY(0)";
+            letter.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 50);
+          hint.innerText = "✓ Transmission Unlocked";
+          recordPlayed = true;
+        }, 1200);
+      }
+    }
+
+    /* ==========================================================================
+       PHOTO LIGHTBOX MODAL
+       ========================================================================== */
+    function openLightbox(src, caption) {
+      document.getElementById('lightbox-img').src = src;
+      document.getElementById('lightbox-caption').innerText = caption;
+      document.getElementById('lightbox').style.display = 'flex';
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+    }
+
+    /* ==========================================================================
+       BACKGROUND AMBIENCE TOGGLE
+       ========================================================================== */
+    const ambient = document.getElementById('ambient-audio');
+    let isPlaying = false;
+    function toggleAmbience() {
+      if (!isPlaying) {
+        ambient.volume = 0.25; // Subtle and low volume
+        ambient.play().then(() => { isPlaying = true; }).catch(() => {});
+      } else {
+        ambient.pause();
+        isPlaying = false;
+      }
+    }
+
+    /* ==========================================================================
+       WISH SENDER (DIRECTLY SENDS HER WISH TO YOU)
+       ========================================================================== */
+    function sendWishToStars() {
+      const text = document.getElementById('wish-text').value.trim();
+      const status = document.getElementById('wish-status');
+
+      if (!text) {
+        status.innerText = "Please write a wish before launching.";
+        return;
+      }
+
+      status.innerText = "Transmitting wish across the cosmos...";
+
+      /* 
+         HOW TO RECEIVE HER WISH:
+         Option A: Use free Formspree (create a form at formspree.io and paste your URL below)
+         Option B: Paste a private Discord/Telegram webhook URL here.
+      */
+      const WEBHOOK_URL = "https://formspree.io/f/your-form-id"; // <-- Paste your free endpoint here if desired
+
+      // Sends via fetch (works silently in background)
+      fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ birthdayWish: text, timestamp: new Date().toISOString() })
+      }).catch(() => {
+        // Even if no endpoint is configured yet, it graciously confirms to her!
+      });
+
+      // Feedback for her
+      setTimeout(() => {
+        document.getElementById('wish-text').value = "";
+        status.innerText = "✦ Wish received by the stars. Happy Birthday!";
+      }, 1000);
+    }
+
+    /* ==========================================================================
+       BACKGROUND STARFIELD
+       ========================================================================== */
+    const canvas = document.getElementById('space-canvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      stars = [];
+      for (let i = 0; i < 70; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 1.5 + 0.3,
+          speed: Math.random() * 0.01 + 0.005,
+          phase: Math.random() * Math.PI
+        });
+      }
+    }
+
+    function loop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(s => {
+        s.phase += s.speed;
+        const opacity = (Math.sin(s.phase) + 1) / 2 * 0.8;
+        ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      requestAnimationFrame(loop);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    loop();
+  </script>
+</body>
+</html>

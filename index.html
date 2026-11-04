@@ -2,261 +2,529 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Treasure Hunt - Level 2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Classified Transmission</title>
+
+  <!-- Industrial & Monospace Space Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@600;800&display=swap" rel="stylesheet">
+
   <style>
+    /* ==========================================================================
+       THEME & COLOR VARIABLES (Built around #001154)
+       ========================================================================== */
+    :root {
+      --space-deep: #000824;
+      --space-navy: #001154;      /* Your custom requested deep space blue */
+      --space-glow: #0a258a;
+      --gold-primary: #ffd700;    /* Burnished golden record tone */
+      --gold-glow: rgba(255, 215, 0, 0.35);
+      --starlight: #eef2ff;
+      --danger-red: #ff3366;
+      --font-mono: 'Space Mono', monospace;
+      --font-display: 'Syne', sans-serif;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      background-color: #0b0c10;
-      color: #c5c6c7;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(circle at 50% 30%, #06186b 0%, var(--space-navy) 40%, var(--space-deep) 100%);
+      color: var(--starlight);
+      font-family: var(--font-mono);
       min-height: 100vh;
+      overflow: hidden;
       display: flex;
-      justify-content: center;
       align-items: center;
-      padding: 20px;
+      justify-content: center;
+      position: relative;
     }
 
-    .container {
-      width: 100%;
-      max-width: 480px;
-      background: #1f2833;
-      border: 2px solid #66fcf1;
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 0 20px rgba(102, 252, 241, 0.2);
-      text-align: center;
-    }
-
-    h1 {
-      color: #66fcf1;
-      font-size: 1.6rem;
-      margin-bottom: 8px;
-    }
-
-    .subtitle {
-      font-size: 0.9rem;
-      color: #8892b0;
-      margin-bottom: 24px;
-    }
-
-    .question-box {
-      background: #0b0c10;
-      padding: 16px;
-      border-radius: 8px;
-      border-left: 4px solid #66fcf1;
-      text-align: left;
-      margin-bottom: 20px;
-      font-size: 1rem;
-      line-height: 1.4;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 12px 16px;
-      background: #0b0c10;
-      border: 1px solid #45a29e;
-      border-radius: 6px;
-      color: #ffffff;
-      font-size: 1rem;
-      margin-bottom: 16px;
-      outline: none;
-      transition: border-color 0.2s ease;
-    }
-
-    input[type="text"]:focus {
-      border-color: #66fcf1;
-      box-shadow: 0 0 8px rgba(102, 252, 241, 0.3);
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #66fcf1;
-      color: #0b0c10;
-      font-weight: bold;
-      border: none;
-      border-radius: 6px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.2s ease, transform 0.1s ease;
-    }
-
-    button:hover {
-      background: #45a29e;
-    }
-
-    button:active {
-      transform: scale(0.98);
-    }
-
-    /* Modal for wrong answer feedback */
-    .modal-overlay {
-      display: none;
-      position: fixed;
+    /* Automated Gentle Starfield Canvas */
+    #starfield {
+      position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      z-index: 100;
+      z-index: 1;
+      pointer-events: none;
     }
 
-    .modal-content {
-      background: #1f2833;
-      border: 2px solid #ff4d4d;
-      border-radius: 12px;
-      padding: 24px;
-      max-width: 360px;
-      width: 100%;
+    /* Ambient Subtle Nebula Glow */
+    .nebula-glow {
+      position: absolute;
+      width: 380px;
+      height: 380px;
+      background: radial-gradient(circle, var(--space-glow) 0%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(60px);
+      z-index: 2;
+      opacity: 0.6;
+      animation: drift 14s ease-in-out infinite alternate;
+    }
+
+    @keyframes drift {
+      0% { transform: translate(-30px, -20px) scale(0.9); }
+      100% { transform: translate(30px, 30px) scale(1.15); }
+    }
+
+    /* Outer Container */
+    .console-wrapper {
+      position: relative;
+      z-index: 10;
+      width: 90%;
+      max-width: 440px;
+      padding: 32px 24px;
+      background: rgba(0, 17, 84, 0.45);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 215, 0, 0.2);
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(10, 37, 138, 0.4);
       text-align: center;
-      box-shadow: 0 0 20px rgba(255, 77, 77, 0.3);
-      animation: popIn 0.25s ease-out;
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    @keyframes popIn {
-      from { transform: scale(0.8); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    .emoji {
-      font-size: 4rem;
-      margin-bottom: 12px;
-    }
-
-    .modal-title {
-      color: #ff4d4d;
-      font-size: 1.3rem;
-      font-weight: bold;
+    /* Top Telemetry Header */
+    .telemetry-tag {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold-primary);
       margin-bottom: 8px;
+      opacity: 0.85;
     }
 
-    .modal-desc {
-      color: #c5c6c7;
-      font-size: 0.95rem;
+    .main-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      line-height: 1.3;
+      margin-bottom: 8px;
+      color: #ffffff;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+
+    .sub-prompt {
+      font-size: 12px;
+      opacity: 0.75;
+      margin-bottom: 24px;
+      letter-spacing: 1px;
+    }
+
+    /* PIN Dots Display */
+    .pin-display {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .pin-dot {
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--gold-primary);
+      border-radius: 50%;
+      background: transparent;
+      transition: all 0.25s ease;
+      box-shadow: 0 0 6px rgba(255, 215, 0, 0.1);
+    }
+
+    .pin-dot.filled {
+      background: var(--gold-primary);
+      box-shadow: 0 0 14px var(--gold-primary);
+      transform: scale(1.15);
+    }
+
+    /* Keypad Grid (Touch Optimized for Android) */
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
       margin-bottom: 20px;
     }
 
-    .retry-btn {
-      background: #ff4d4d;
-      color: #ffffff;
+    .key-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 700;
+      padding: 16px 0;
+      border-radius: 12px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
     }
 
-    .retry-btn:hover {
-      background: #cc0000;
+    .key-btn:active {
+      background: var(--gold-primary);
+      color: var(--space-deep);
+      transform: scale(0.94);
+      box-shadow: 0 0 15px var(--gold-primary);
     }
 
-    /* Success Screen */
-    .success-box {
-      display: none;
-    }
-
-    .success-icon {
-      font-size: 3.5rem;
-      margin-bottom: 12px;
-    }
-
-    .pass-container {
-      background: #0b0c10;
-      border: 2px dashed #66fcf1;
+    /* Action & Unlock Buttons */
+    .action-btn {
+      width: 100%;
       padding: 16px;
-      border-radius: 8px;
-      margin: 20px 0;
-    }
-
-    .pass-label {
-      font-size: 0.8rem;
-      color: #8892b0;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 6px;
-    }
-
-    .pass-key {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #66fcf1;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
       letter-spacing: 2px;
-      word-break: break-all;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #ffd700 0%, #d4af37 100%);
+      color: #000c3b;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px var(--gold-glow);
+      transition: all 0.3s ease;
+    }
+
+    .action-btn:active {
+      transform: scale(0.98);
+      filter: brightness(1.1);
+    }
+
+    /* Shake Animation for Wrong PIN */
+    .shake-error {
+      animation: shake 0.45s ease-in-out;
+      border-color: var(--danger-red) !important;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-10px); }
+      40%, 80% { transform: translateX(10px); }
+    }
+
+    .error-msg {
+      font-size: 11px;
+      color: var(--danger-red);
+      margin-top: 14px;
+      height: 18px;
+      letter-spacing: 0.5px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .error-msg.visible {
+      opacity: 1;
+    }
+
+    /* ==========================================================================
+       STAGE 2: VOICE BRIEFING HUB (Revealed after PIN)
+       ========================================================================== */
+    #voice-stage {
+      display: none;
+      opacity: 0;
+      transform: translateY(15px);
+      transition: all 0.6s ease;
+    }
+
+    .waveform-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 60px;
+      margin: 24px 0;
+    }
+
+    .wave-bar {
+      width: 5px;
+      height: 12px;
+      background: var(--gold-primary);
+      border-radius: 4px;
+      transition: height 0.15s ease;
+    }
+
+    .wave-bar.playing {
+      animation: wave 1s ease-in-out infinite alternate;
+    }
+
+    .wave-bar:nth-child(2) { animation-delay: 0.15s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.3s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.45s; }
+    .wave-bar:nth-child(5) { animation-delay: 0.2s; }
+    .wave-bar:nth-child(6) { animation-delay: 0.35s; }
+
+    @keyframes wave {
+      0% { height: 8px; }
+      100% { height: 48px; box-shadow: 0 0 10px var(--gold-primary); }
+    }
+
+    .play-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 0 auto 20px;
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: rgba(255, 215, 0, 0.15);
+      border: 2px solid var(--gold-primary);
+      color: var(--gold-primary);
+      cursor: pointer;
+      font-size: 22px;
+      box-shadow: 0 0 20px var(--gold-glow);
+      transition: all 0.2s ease;
+    }
+
+    .play-trigger:active {
+      transform: scale(0.92);
+      background: var(--gold-primary);
+      color: var(--space-deep);
+    }
+
+    #go-btn {
+      display: none;
+      opacity: 0;
+      margin-top: 15px;
+      animation: fadeIn 0.8s forwards;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
     }
   </style>
 </head>
 <body>
 
-  <div class="container" id="quizCard">
-    <h1>STAGE 2 HURDLE</h1>
-    <p class="subtitle">Answer correctly to obtain the Discord key</p>
+  <!-- Starfield background -->
+  <canvas id="starfield"></canvas>
+  <div class="nebula-glow"></div>
 
-    <div class="question-box">
-      <strong>Question:</strong><br />
-      What is the secret answer required to clear this stage?
+  <!-- Main Console -->
+  <div class="console-wrapper" id="console-box">
+
+    <!-- ==========================================
+         STAGE 1: PIN LOCK PAD
+         ========================================== -->
+    <div id="pin-stage">
+      <div class="telemetry-tag">// RESTRICTED SECTOR 01</div>
+      <h1 class="main-title">Classified Transmission for My Favorite Person</h1>
+      <p class="sub-prompt">ENTER YOUR PIN TO DECRYPT</p>
+
+      <div class="pin-display">
+        <div class="pin-dot" id="dot-0"></div>
+        <div class="pin-dot" id="dot-1"></div>
+        <div class="pin-dot" id="dot-2"></div>
+        <div class="pin-dot" id="dot-3"></div>
+      </div>
+
+      <div class="keypad">
+        <button class="key-btn" onclick="pressKey('1')">1</button>
+        <button class="key-btn" onclick="pressKey('2')">2</button>
+        <button class="key-btn" onclick="pressKey('3')">3</button>
+        <button class="key-btn" onclick="pressKey('4')">4</button>
+        <button class="key-btn" onclick="pressKey('5')">5</button>
+        <button class="key-btn" onclick="pressKey('6')">6</button>
+        <button class="key-btn" onclick="pressKey('7')">7</button>
+        <button class="key-btn" onclick="pressKey('8')">8</button>
+        <button class="key-btn" onclick="pressKey('9')">9</button>
+        <button class="key-btn" onclick="clearPin()">CLR</button>
+        <button class="key-btn" onclick="pressKey('0')">0</button>
+        <button class="key-btn" onclick="backspace()">⌫</button>
+      </div>
+
+      <button class="action-btn" onclick="validatePin()">Unlock Transmission</button>
+      <div class="error-msg" id="error-banner"></div>
     </div>
 
-    <form id="quizForm" onsubmit="checkAnswer(event)">
-      <input type="text" id="answerInput" placeholder="Type your answer here..." autocomplete="off" required />
-      <button type="submit">SUBMIT ANSWER</button>
-    </form>
-  </div>
+    <!-- ==========================================
+         STAGE 2: VOICE BRIEFING HUB
+         ========================================== -->
+    <div id="voice-stage">
+      <div class="telemetry-tag">// AUDIO FREQUENCY DETECTED</div>
+      <h2 class="main-title" style="font-size: 20px;">Mission Briefing</h2>
+      <p class="sub-prompt">Tap play to decode incoming transmission</p>
 
-  <!-- Success Display -->
-  <div class="container success-box" id="successCard">
-    <div class="success-icon">🎉</div>
-    <h1>ACCESS GRANTED!</h1>
-    <p class="subtitle">You have solved the hurdle.</p>
+      <!-- Audio Element: Replace "assets/audio/briefing.mp3" with your voice note -->
+      <audio id="briefing-audio" src="assets/audio/briefing.mp3" preload="auto"></audio>
 
-    <div class="pass-container">
-      <div class="pass-label">Next Stage Password</div>
-      <div class="pass-key">WEWILLFOREVER!</div>
+      <!-- Minimalist Waveform Visualizer -->
+      <div class="waveform-box">
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+      </div>
+
+      <!-- Play / Pause trigger -->
+      <button class="play-trigger" id="play-btn" onclick="toggleAudio()">
+        <span id="play-icon">▶</span>
+      </button>
+
+      <!-- Segue to Page 2 (Reveals after voice recording finishes) -->
+      <button class="action-btn" id="go-btn" onclick="goToVoyage()">
+        Go to Transmission →
+      </button>
     </div>
 
-    <p style="font-size: 0.85rem; color: #8892b0;">
-      Copy this password and return to Discord to proceed to the next stage.
-    </p>
-  </div>
-
-  <!-- Incorrect Answer Modal Overlay -->
-  <div class="modal-overlay" id="errorModal">
-    <div class="modal-content">
-      <div class="emoji" id="modalEmoji">😡</div>
-      <div class="modal-title">WRONG ANSWER!</div>
-      <div class="modal-desc">You got the answer wrong. Try again!</div>
-      <button class="retry-btn" onclick="closeModal()">TRY AGAIN</button>
-    </div>
   </div>
 
   <script>
-    const CORRECT_ANSWER = "ILYHEH";
-    const emojis = ["😡", "😭", "🤬", "🥺"];
+    /* ==========================================================================
+       CONFIGURATION: SET YOUR SECRET PIN CODE HERE!
+       ========================================================================== */
+    const SECRET_PIN = "1234"; // <-- Change this to your anniversary, her birthday (e.g. "0425"), etc.
 
-    function checkAnswer(event) {
-      event.preventDefault();
-      const userVal = document.getElementById("answerInput").value.trim().toUpperCase();
+    let enteredPin = "";
+    const dots = [document.getElementById('dot-0'), document.getElementById('dot-1'), document.getElementById('dot-2'), document.getElementById('dot-3')];
+    const errorBanner = document.getElementById('error-banner');
+    const consoleBox = document.getElementById('console-box');
 
-      if (userVal === CORRECT_ANSWER) {
-        document.getElementById("quizCard").style.display = "none";
-        document.getElementById("successCard").style.display = "block";
-      } else {
-        // Randomly show an angry or weeping emoji
-        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-        document.getElementById("modalEmoji").textContent = randomEmoji;
-        document.getElementById("errorModal").style.display = "flex";
+    function updateDots() {
+      dots.forEach((dot, index) => {
+        if (index < enteredPin.length) {
+          dot.classList.add('filled');
+        } else {
+          dot.classList.remove('filled');
+        }
+      });
+    }
+
+    function pressKey(num) {
+      if (enteredPin.length < 4) {
+        enteredPin += num;
+        updateDots();
+        errorBanner.classList.remove('visible');
       }
     }
 
-    function closeModal() {
-      document.getElementById("errorModal").style.display = "none";
-      const input = document.getElementById("answerInput");
-      input.value = "";
-      input.focus();
+    function clearPin() {
+      enteredPin = "";
+      updateDots();
+      errorBanner.classList.remove('visible');
     }
+
+    function backspace() {
+      enteredPin = enteredPin.slice(0, -1);
+      updateDots();
+    }
+
+    function validatePin() {
+      if (enteredPin === SECRET_PIN) {
+        // Correct PIN -> Switch to Voice Stage
+        document.getElementById('pin-stage').style.display = 'none';
+        const voiceStage = document.getElementById('voice-stage');
+        voiceStage.style.display = 'block';
+        setTimeout(() => {
+          voiceStage.style.opacity = '1';
+          voiceStage.style.transform = 'translateY(0)';
+        }, 50);
+      } else {
+        // Wrong PIN -> Shake effect + requested exact message
+        consoleBox.classList.add('shake-error');
+        errorBanner.innerText = 'Access Denied — "Only the Birthday Girl has clearance"';
+        errorBanner.classList.add('visible');
+
+        setTimeout(() => {
+          consoleBox.classList.remove('shake-error');
+        }, 500);
+        clearPin();
+      }
+    }
+
+    /* ==========================================================================
+       AUDIO & VISUALIZER LOGIC
+       ========================================================================== */
+    const audio = document.getElementById('briefing-audio');
+    const playIcon = document.getElementById('play-icon');
+    const waveBars = document.querySelectorAll('.wave-bar');
+    const goBtn = document.getElementById('go-btn');
+
+    function toggleAudio() {
+      if (audio.paused) {
+        audio.play().then(() => {
+          playIcon.innerText = '❚❚';
+          waveBars.forEach(bar => bar.classList.add('playing'));
+        }).catch(err => {
+          // If no local file yet, simulate completion for preview testing!
+          console.warn("Audio placeholder not found. Simulating voice playback preview...");
+          simulateVoicePlayback();
+        });
+      } else {
+        audio.pause();
+        playIcon.innerText = '▶';
+        waveBars.forEach(bar => bar.classList.remove('playing'));
+      }
+    }
+
+    // Audio finished playing -> Reveal "Go to Transmission" button
+    audio.onended = function() {
+      playIcon.innerText = '✓';
+      waveBars.forEach(bar => bar.classList.remove('playing'));
+      goBtn.style.display = 'block';
+    };
+
+    // Fallback simulation so you can test without an MP3 file right away
+    function simulateVoicePlayback() {
+      playIcon.innerText = '❚❚';
+      waveBars.forEach(bar => bar.classList.add('playing'));
+      setTimeout(() => {
+        playIcon.innerText = '✓';
+        waveBars.forEach(bar => bar.classList.remove('playing'));
+        goBtn.style.display = 'block';
+      }, 3500); // Reveals button after 3.5 seconds
+    }
+
+    function goToVoyage() {
+      window.location.href = "voyage.html";
+    }
+
+    /* ==========================================================================
+       GENTLE AUTOMATED STARFIELD
+       ========================================================================== */
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      stars = [];
+      const numStars = Math.floor((canvas.width * canvas.height) / 8000);
+      for (let i = 0; i < numStars; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 1.4 + 0.4,
+          alpha: Math.random(),
+          speed: Math.random() * 0.008 + 0.003
+        });
+      }
+    }
+
+    function animateStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(star => {
+        star.alpha += star.speed;
+        const opacity = (Math.sin(star.alpha) + 1) / 2;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(238, 242, 255, ${opacity * 0.8})`;
+        ctx.fill();
+      });
+      requestAnimationFrame(animateStars);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    animateStars();
   </script>
 </body>
 </html>
